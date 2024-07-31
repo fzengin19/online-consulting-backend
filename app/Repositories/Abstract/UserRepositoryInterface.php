@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Concrete;
+namespace App\Repositories\Abstract;
 
 interface UserRepositoryInterface
 {
