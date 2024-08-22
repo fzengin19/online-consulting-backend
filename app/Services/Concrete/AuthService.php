@@ -6,11 +6,13 @@ use App\Exceptions\DuplicateEmailException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\User;
 use App\Repositories\Abstract\UserRepositoryInterface;
 use App\Services\Abstract\AuthServiceInterface;
 use App\Services\ServiceResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class AuthService implements AuthServiceInterface
 {
@@ -28,17 +30,17 @@ class AuthService implements AuthServiceInterface
             throw new DuplicateEmailException();
         }
         $user = $this->userRepository->create($request->validated());
-
+        $token = $user->createToken('api-token')->plainTextToken;
         return new ServiceResponse([
             'message' => 'User registered successfully',
             'user' => $user,
+            'token' => $token
         ], 201);
     }
 
     public function login(LoginRequest $request): ServiceResponse
     {
         $user = $this->userRepository->findByEmail($request->email);
-
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw new InvalidCredentialsException('Invalid email or password.');
         }
@@ -54,7 +56,7 @@ class AuthService implements AuthServiceInterface
 
     public function logout(Request $request): ServiceResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::user()->currentAccessToken()->delete();
         return new ServiceResponse(['message' => 'Logged out successfully'], 200);
     }
 }

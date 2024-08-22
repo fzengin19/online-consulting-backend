@@ -20,14 +20,18 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $response = $this->authService->register($request);
-
         return response()->json($response->data, $response->status);
     }
 
     public function login(LoginRequest $request)
     {
         $response = $this->authService->login($request);
+        return response()->json($response->data, $response->status);
+    }
 
+    public function logout(Request $request)
+    {
+        $response = $this->authService->logout($request);
         return response()->json($response->data, $response->status);
     }
 }
