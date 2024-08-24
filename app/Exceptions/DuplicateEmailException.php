@@ -2,12 +2,32 @@
 
 namespace App\Exceptions;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Exception;
+use Illuminate\Http\JsonResponse;
 
-class DuplicateEmailException extends HttpException
+class DuplicateEmailException extends Exception
 {
-    public function __construct(string $message = 'This email address is already registered.', int $status = 409)
+    protected $message;
+    protected $statusCode;
+
+    public function __construct(string $message = 'This email address is already registered.', int $statusCode = 409)
     {
-        parent::__construct($status, $message);
+        $this->message = $message;
+        $this->statusCode = $statusCode;
+        parent::__construct($message, $statusCode);
+    }
+
+    public function report()
+    {
+    }
+
+    public function render($request)
+    {
+        return new JsonResponse([
+            'message' => $this->getMessage(),
+            'errors' => [
+                'email' => [$this->getMessage()],
+            ],
+        ], $this->statusCode);
     }
 }

@@ -12,9 +12,9 @@ class AuthController extends Controller
     protected AuthServiceInterface $authService;
 
 
-    public function __construct(AuthServiceInterface $authService)
+    public function __construct(AuthServiceInterface $authServiceInterface)
     {
-        $this->authService = $authService;
+        $this->authService = $authServiceInterface;
     }
 
     public function register(RegisterRequest $request)
