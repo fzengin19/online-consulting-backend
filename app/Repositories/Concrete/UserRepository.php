@@ -12,8 +12,20 @@ class UserRepository implements UserRepositoryInterface
         return User::create($data);
     }
 
+    public function find(int $id)
+    {
+        return User::find($id);
+    }
+
     public function findByEmail(string $email)
     {
         return User::where('email', $email)->first();
+    }
+
+    public function updateAvatar(int $id, $Avatar)
+    {
+        return User::where('id', $id)->update([
+            'avatar' => $Avatar,
+        ]);
     }
 }
