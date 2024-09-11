@@ -23,7 +23,7 @@ class UpdateUserProfileRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'phone' => 'nullable'
+            'phone' => ['nullable', 'regex:/^\+?[1-9]\d{1,14}$/'],
         ];
     }
 }
