@@ -11,6 +11,7 @@ use App\Repositories\Abstract\UserRepositoryInterface;
 use App\Services\Abstract\AuthServiceInterface;
 use App\Services\ServiceResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
@@ -29,8 +30,11 @@ class AuthService implements AuthServiceInterface
         if ($user) {
             throw new DuplicateEmailException();
         }
-        $user = $this->userRepository->create($request->validated());
+        $validatedData = $request->validated();
+        $validatedData['slug'] = Str::slug($validatedData['name']) . '-' . uniqid(5);
+        $user = $this->userRepository->create($validatedData);
         $token = $user->createToken('api-token')->plainTextToken;
+        $user->load('address');
         return new ServiceResponse([
             'message' => 'User registered successfully',
             'user' => $user,
@@ -46,7 +50,7 @@ class AuthService implements AuthServiceInterface
         }
 
         $token = $user->createToken('api-token')->plainTextToken;
-
+        $user->load('address');
         return new ServiceResponse([
             'message' => 'Logged in successfully',
             'token' => $token,
