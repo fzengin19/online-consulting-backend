@@ -22,14 +22,8 @@ class UserRepository implements UserRepositoryInterface
         return User::where('email', $email)->first();
     }
 
-    public function updateAvatar(int $id, string $Avatar)
-    {
-        return User::where('id', $id)->update([
-            'avatar' => $Avatar,
-        ]);
-    }
 
-    public function updateProfile(int $id, array $data)
+    public function updateById(int $id, array $data)
     {
         $updated = User::where('id', $id)->update($data);
 
