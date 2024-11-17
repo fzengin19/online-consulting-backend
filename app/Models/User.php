@@ -24,7 +24,9 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'phone'
+        'phone',
+        'slug',
+        'title'
     ];
 
     /**
@@ -52,5 +54,9 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPasswordNotification($token));
+    }
+    public function address()
+    {
+        return $this->hasOneThrough(Address::class, UserAddress::class, 'user_id', 'id', 'id', 'address_id');
     }
 }
