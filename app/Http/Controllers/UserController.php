@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UpdateAvatarRequest;
+use App\Http\Requests\User\UpdateUserAddressRequest;
 use App\Http\Requests\User\UpdateUserProfileRequest;
 use App\Services\Abstract\UserServiceInterface;
 
@@ -25,6 +26,13 @@ class UserController extends Controller
     public function updateProfile(UpdateUserProfileRequest $request)
     {
         $response = $this->userService->updateProfile($request);
+
+        return response()->json($response->data, $response->status);
+    }
+
+    public function updateAddress(UpdateUserAddressRequest $request)
+    {
+        $response = $this->userService->updateAddress($request);
 
         return response()->json($response->data, $response->status);
     }

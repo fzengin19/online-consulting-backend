@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\SleepMiddleware;
+use Illuminate\Support\Facades\Storage;
 
 Route::prefix('auth')->group(function () {
 
@@ -30,6 +31,21 @@ Route::prefix('user')->middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
-    Route::post('update-profile-picture', [UserController::class, 'updateAvatar']);
     Route::put('profile', [UserController::class, 'updateProfile']);
+    Route::put('update-address', [UserController::class, 'updateAddress']);
+    Route::post('update-avatar', [UserController::class, 'updateAvatar']);
+})->middleware(SleepMiddleware::class);
+
+
+// routes/api.php
+
+Route::get('/images/{fileName}', function (Request $request, $fileName) {
+    $path = storage_path('app/images/' . $fileName);
+
+    if (!Storage::exists($path)) {
+        return response()->json(['message' => 'File not found'], 404);
+    }
+
+    return response()->file($path);
 });
+
