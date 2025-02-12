@@ -30,11 +30,10 @@ Route::prefix('user')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', function (Request $request) {
         return $request->user();
     });
-
     Route::put('profile', [UserController::class, 'updateProfile']);
     Route::put('update-address', [UserController::class, 'updateAddress']);
     Route::post('update-avatar', [UserController::class, 'updateAvatar']);
-})->middleware(SleepMiddleware::class);
+});
 
 
 // routes/api.php
