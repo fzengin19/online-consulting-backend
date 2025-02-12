@@ -51,10 +51,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new CustomResetPasswordNotification($token));
-    }
     public function address()
     {
         return $this->hasOneThrough(Address::class, UserAddress::class, 'user_id', 'id', 'id', 'address_id');
