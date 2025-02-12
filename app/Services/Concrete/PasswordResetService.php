@@ -23,7 +23,6 @@ class PasswordResetService implements PasswordResetServiceInterface
 
     public function sendResetLink(SendResetLinkEmailRequest $request): ServiceResponse
     {
-        $request->validate(['email' => 'required|email']);
 
         $response = Password::broker()->sendResetLink(
             $request->only('email')
