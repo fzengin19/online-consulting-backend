@@ -40,10 +40,9 @@ class PasswordResetService implements PasswordResetServiceInterface
         $response = Password::broker()->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->setRememberToken(Str::random(60));
-                $this->userRepository->updateById($user->id, ['password' => $user->password]);
-
+                $password = Hash::make($password);
+                $this->userRepository->updateById($user->id, ['password' => $password]);
+                $user->refresh();
                 event(new PasswordReset($user));
             }
         );
