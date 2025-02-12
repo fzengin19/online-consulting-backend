@@ -5,23 +5,26 @@ namespace App\Services\Concrete;
 use App\Http\Requests\User\UpdateAvatarRequest;
 use App\Http\Requests\User\UpdateUserAddressRequest;
 use App\Http\Requests\User\UpdateUserProfileRequest;
-use App\Models\Address;
-use App\Models\UserAddress;
 use App\Repositories\Abstract\AddressRepositoryInterface;
+use App\Repositories\Abstract\UserAddressRepositoryInterface;
 use App\Repositories\Abstract\UserRepositoryInterface;
 use App\Services\Abstract\UserServiceInterface;
 use App\Services\ServiceResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class UserService implements UserServiceInterface
 {
     protected UserRepositoryInterface $userRepository;
     protected AddressRepositoryInterface $addressRepository;
+    protected UserAddressRepositoryInterface $userAddressRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository, AddressRepositoryInterface $addressRepository)
+    public function __construct(UserRepositoryInterface $userRepository, AddressRepositoryInterface $addressRepository, UserAddressRepositoryInterface $userAddressRepository)
     {
         $this->userRepository = $userRepository;
         $this->addressRepository = $addressRepository;
+        $this->userAddressRepository = $userAddressRepository;
     }
 
 
@@ -48,7 +51,7 @@ class UserService implements UserServiceInterface
     public function updateProfile(UpdateUserProfileRequest $request): ServiceResponse
     {
         $user = $request->user();
-        // sleep(1);
+
         $updatedUser = $this->userRepository->updateById($user->id, $request->validated());
         if ($updatedUser) {
             $updatedUser->load('address');
@@ -59,24 +62,32 @@ class UserService implements UserServiceInterface
     }
     public function updateAddress(UpdateUserAddressRequest $request): ServiceResponse
     {
-        $user = $request->user();
+        try {
+            return DB::transaction(function () use ($request) {
+                $user = $request->user();
 
-        $Address = $this->addressRepository->getByPlaceID($request->place_id);
+                $address = $this->addressRepository->updateOrCreateByPlaceId(
+                    $request->place_id,
+                    $request->validated()
+                );
 
-        if ($Address) {
-            $Address->update($request->validated());
-        } else {
-            $Address = Address::create($request->validated());
+                $this->userAddressRepository->updateOrCreateByUserId(
+                    $user->id,
+                    ['address_id' => $address->id]
+                );
+
+                return new ServiceResponse([
+                    'message' => 'Address updated successfully.',
+                    'user' => $user->load('address')
+                ], 200);
+            });
+        } catch (\Exception $e) {
+
+            Log::error('Address update failed: ' . $e->getMessage());
+
+            return new ServiceResponse([
+                'message' => 'Failed to update address. Please try again.'
+            ], 500);
         }
-
-        $UserAddress = UserAddress::updateOrCreate(
-            ['user_id' => $user->id],
-            ['address_id' => $Address->id]
-        );
-
-        return new ServiceResponse([
-            'message' => 'Address updated successfully.',
-            'user' => $user->load('address')
-        ], 200);
     }
 }

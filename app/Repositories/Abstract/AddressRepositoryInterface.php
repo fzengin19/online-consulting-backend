@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Abstract;
 
+use App\Models\Address;
+
 interface AddressRepositoryInterface
 {
-    public function getByPlaceID(string $placeId);
-    public function updateByPlaceID(int $placeId, array $data);
+    public function updateOrCreateByPlaceId(string $placeId, array $attributes): Address;
+
 }

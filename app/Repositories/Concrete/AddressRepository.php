@@ -8,13 +8,9 @@ use App\Repositories\Abstract\AddressRepositoryInterface;
 
 class AddressRepository implements AddressRepositoryInterface
 {
-    public function getByPlaceId(string $placeId)
+    public function updateOrCreateByPlaceId(string $placeId, array $attributes): Address
     {
-        return Address::where('place_id', $placeId)->first();
+        return Address::updateOrCreate(['place_id' => $placeId], $attributes);
     }
 
-    public function updateByPlaceID(int $placeId, array $data)
-    {
-        return Address::where('place_id', $placeId)->update($data);
-    }
 }
