@@ -38,13 +38,14 @@ Route::prefix('user')->middleware(['auth:sanctum'])->group(function () {
 
 // routes/api.php
 
-Route::get('/images/{fileName}', function (Request $request, $fileName) {
-    $path = storage_path('app/images/' . $fileName);
+Route::get('/images/{fileName}', function (Request $request, $filePath) {
 
-    if (!Storage::exists($path)) {
-        return response()->json(['message' => 'File not found'], 404);
+
+    if (Storage::disk('local')->exists($filePath)) {
+        $path = Storage::disk('local')->path($filePath);
+        return response()->file($path);
     }
 
-    return response()->file($path);
+    return response()->json(['message' => 'File not found'], 404);
 });
 

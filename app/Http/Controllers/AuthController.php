@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Dtos\LoginDto;
+use App\Dtos\RegisterDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\Abstract\AuthServiceInterface;
@@ -19,13 +21,13 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $response = $this->authService->register($request);
+        $response = $this->authService->register(new RegisterDto($request->validated()));
         return response()->json($response->data, $response->status);
     }
 
     public function login(LoginRequest $request)
     {
-        $response = $this->authService->login($request);
+        $response = $this->authService->login(new LoginDto($request->validated()));
         return response()->json($response->data, $response->status);
     }
 

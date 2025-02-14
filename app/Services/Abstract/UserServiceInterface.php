@@ -2,14 +2,14 @@
 
 namespace App\Services\Abstract;
 
-use App\Http\Requests\User\UpdateAvatarRequest;
-use App\Http\Requests\User\UpdateUserAddressRequest;
-use App\Http\Requests\User\UpdateUserProfileRequest;
+use App\Dtos\UpdateAvatarDto;
+use App\Dtos\UpdateUserAddressDto;
+use App\Dtos\UpdateUserProfileDto;
 use App\Services\ServiceResponse;
 
 interface UserServiceInterface
 {
-    public function updateAvatar(UpdateAvatarRequest $request): ServiceResponse;
-    public function updateProfile(UpdateUserProfileRequest $request): ServiceResponse;
-    public function updateAddress(UpdateUserAddressRequest $request): ServiceResponse;
+    public function updateAvatar(UpdateAvatarDto $updateAvatarDto): ServiceResponse;
+    public function updateProfile(UpdateUserProfileDto $updateUserProfileDto): ServiceResponse;
+    public function updateAddress(UpdateUserAddressDto $updateUserAddressDto): ServiceResponse;
 }

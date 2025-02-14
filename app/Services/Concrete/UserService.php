@@ -2,7 +2,9 @@
 
 namespace App\Services\Concrete;
 
-use App\Http\Requests\User\UpdateAvatarRequest;
+use App\Dtos\UpdateAvatarDto;
+use App\Dtos\UpdateUserAddressDto;
+use App\Dtos\UpdateUserProfileDto;
 use App\Http\Requests\User\UpdateUserAddressRequest;
 use App\Http\Requests\User\UpdateUserProfileRequest;
 use App\Repositories\Abstract\AddressRepositoryInterface;
@@ -10,6 +12,7 @@ use App\Repositories\Abstract\UserAddressRepositoryInterface;
 use App\Repositories\Abstract\UserRepositoryInterface;
 use App\Services\Abstract\UserServiceInterface;
 use App\Services\ServiceResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -28,15 +31,17 @@ class UserService implements UserServiceInterface
     }
 
 
-    public function updateAvatar(UpdateAvatarRequest $request): ServiceResponse
+    public function updateAvatar(UpdateAvatarDto $updateAvatarDto): ServiceResponse
     {
-        $user = $request->user();
+        $user = Auth::user();
 
         $currentAvatar = $user->avatar;
 
-        $newPath = $request->file('avatar')->store('avatars');
+        $name = $updateAvatarDto->avatar->getClientOriginalName();
+      
+        $newPath = $updateAvatarDto->avatar->storeAs('avatars', $name);
 
-        $updated = $this->userRepository->updateById($user->id, ['avatar' => $newPath]);
+        $updated = $this->userRepository->update($user->id, ['avatar' => $newPath]);
 
         if ($currentAvatar) {
             Storage::delete($currentAvatar);
@@ -48,11 +53,11 @@ class UserService implements UserServiceInterface
         return new ServiceResponse(['message' => 'Failed to update avatar.'], 500);
     }
 
-    public function updateProfile(UpdateUserProfileRequest $request): ServiceResponse
+    public function updateProfile(UpdateUserProfileDto $updateUserProfileDto): ServiceResponse
     {
-        $user = $request->user();
+        $user = Auth::user();
 
-        $updatedUser = $this->userRepository->updateById($user->id, $request->validated());
+        $updatedUser = $this->userRepository->update($user->id, $updateUserProfileDto->toArray());
         if ($updatedUser) {
             $updatedUser->load('address');
             return new ServiceResponse(['message' => 'Profile data updated successfully.', 'user' => $updatedUser], 200);
@@ -60,15 +65,14 @@ class UserService implements UserServiceInterface
 
         return new ServiceResponse(['message' => 'Failed to update profile data.'], 500);
     }
-    public function updateAddress(UpdateUserAddressRequest $request): ServiceResponse
+    public function updateAddress(UpdateUserAddressDto $updateUserAddressDto): ServiceResponse
     {
         try {
-            return DB::transaction(function () use ($request) {
-                $user = $request->user();
-
+            return DB::transaction(function () use ($updateUserAddressDto) {
+                $user = Auth::user();
                 $address = $this->addressRepository->updateOrCreateByPlaceId(
-                    $request->place_id,
-                    $request->validated()
+                    $updateUserAddressDto->place_id,
+                    $updateUserAddressDto->toArray()
                 );
 
                 $this->userAddressRepository->updateOrCreateByUserId(
@@ -78,7 +82,7 @@ class UserService implements UserServiceInterface
 
                 return new ServiceResponse([
                     'message' => 'Address updated successfully.',
-                    'user' => $user->load('address')
+                    'user' => $user->refresh()->load('address')
                 ], 200);
             });
         } catch (\Exception $e) {

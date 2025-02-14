@@ -2,12 +2,14 @@
 
 namespace App\Services\Abstract;
 
+use App\Dtos\ResetPasswordDto;
+use App\Dtos\SendPasswordResetLinkDto;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\SendResetLinkEmailRequest;
 use App\Services\ServiceResponse;
 
 interface PasswordResetServiceInterface
 {
-    public function sendResetLink(SendResetLinkEmailRequest $request): ServiceResponse;
-    public function reset(ResetPasswordRequest $request): ServiceResponse;
+    public function sendResetLink(SendPasswordResetLinkDto $sendPasswordResetLinkDto): ServiceResponse;
+    public function reset(ResetPasswordDto $resetPasswordDto): ServiceResponse;
 }

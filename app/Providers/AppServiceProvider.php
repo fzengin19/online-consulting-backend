@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Repositories\Abstract\AddressRepositoryInterface;
+use App\Repositories\Abstract\UserAddressRepositoryInterface;
 use App\Repositories\Abstract\UserRepositoryInterface;
 use App\Repositories\Concrete\AddressRepository;
+use App\Repositories\Concrete\UserAddressRepository;
 use App\Repositories\Concrete\UserRepository;
 use App\Services\Abstract\AuthServiceInterface;
 use App\Services\Abstract\PasswordResetServiceInterface;
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(AddressRepositoryInterface::class, AddressRepository::class);
         $this->app->bind(PasswordResetServiceInterface::class, PasswordResetService::class);
+        $this->app->bind(UserAddressRepositoryInterface::class, UserAddressRepository::class);
+
     }
 
     /**

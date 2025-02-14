@@ -2,19 +2,16 @@
 
 namespace App\Repositories\Concrete;
 
+use App\Core\Concrete\BaseRepository;
 use App\Models\User;
 use App\Repositories\Abstract\UserRepositoryInterface;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
-    public function create(array $data)
-    {
-        return User::create($data);
-    }
 
-    public function find(int $id)
+    public function __construct()
     {
-        return User::find($id);
+        parent::__construct(new User());
     }
 
     public function findByEmail(string $email)
@@ -23,10 +20,4 @@ class UserRepository implements UserRepositoryInterface
     }
 
 
-    public function updateById(int $id, array $data)
-    {
-        $updated = User::where('id', $id)->update($data);
-
-        return User::find($id);
-    }
 }

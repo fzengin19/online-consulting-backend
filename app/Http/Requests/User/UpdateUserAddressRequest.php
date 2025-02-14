@@ -23,8 +23,16 @@ class UpdateUserAddressRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'latitude' => [
+                'required',
+                'numeric',
+                'regex:/^-?\d{1,2}\.\d{1,8}$/',
+            ],
+            'longitude' => [
+                'required',
+                'numeric',
+                'regex:/^-?\d{1,3}\.\d{1,8}$/',
+            ],
             'place_id' => 'required|string',
         ];
     }
