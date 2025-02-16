@@ -10,8 +10,10 @@ abstract class BaseDto
     public function __construct(array $data)
     {
         foreach ($data as $key => $value) {
-            if ($value === null) continue;
-            $this->$key = $value;
+            if (property_exists($this, $key) && $value !== null)
+            {
+                $this->$key = $value;
+            }
         }
     }
 
