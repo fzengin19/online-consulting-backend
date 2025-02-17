@@ -2,39 +2,47 @@
 
 namespace App\Providers;
 
-use App\Repositories\Abstract\AddressRepositoryInterface;
-use App\Repositories\Abstract\UserAddressRepositoryInterface;
-use App\Repositories\Abstract\UserRepositoryInterface;
-use App\Repositories\Concrete\AddressRepository;
-use App\Repositories\Concrete\UserAddressRepository;
-use App\Repositories\Concrete\UserRepository;
-use App\Services\Abstract\AuthServiceInterface;
-use App\Services\Abstract\PasswordResetServiceInterface;
-// use App\Services\Abstract\PasswordResetServiceInterface;
-use App\Services\Abstract\UserServiceInterface;
-use App\Services\Concrete\AuthService;
-use App\Services\Concrete\PasswordResetService;
-use App\Services\Concrete\UserService;
+use App\Repositories\Abstract\{
+    AddressRepositoryInterface,
+    UserAddressRepositoryInterface,
+    UserRepositoryInterface
+};
+use App\Repositories\Concrete\{
+    AddressRepository,
+    UserAddressRepository,
+    UserRepository
+};
+use App\Services\Abstract\{
+    AuthServiceInterface,
+    PasswordResetServiceInterface,
+    UserServiceInterface
+};
+use App\Services\Concrete\{
+    AuthService,
+    PasswordResetService,
+    UserService
+};
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * All of the container bindings that should be registered.
      */
-    public function register(): void
+    public $bindings = [
+        // Repository Bindings
+        UserRepositoryInterface::class => UserRepository::class,
+        AddressRepositoryInterface::class => AddressRepository::class,
+        UserAddressRepositoryInterface::class => UserAddressRepository::class,
+
+        // Service Bindings
+        AuthServiceInterface::class => AuthService::class,
+        UserServiceInterface::class => UserService::class,
+        PasswordResetServiceInterface::class => PasswordResetService::class,
+    ];
+
+    public function boot(): void
     {
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(AuthServiceInterface::class, AuthService::class);
-        $this->app->bind(UserServiceInterface::class, UserService::class);
-        $this->app->bind(AddressRepositoryInterface::class, AddressRepository::class);
-        $this->app->bind(PasswordResetServiceInterface::class, PasswordResetService::class);
-        $this->app->bind(UserAddressRepositoryInterface::class, UserAddressRepository::class);
-
+        //
     }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void {}
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Dtos\ResetPasswordDto;
 use App\Dtos\SendPasswordResetLinkDto;
-use Illuminate\Http\Request;
 use App\Services\Abstract\PasswordResetServiceInterface;
 use App\Http\Requests\Auth\SendResetLinkEmailRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
@@ -20,13 +19,15 @@ class PasswordResetController extends Controller
 
     public function sendResetLinkEmail(SendResetLinkEmailRequest $request)
     {
-        $response = $this->passwordResetService->sendResetLink(new SendPasswordResetLinkDto($request->validated()));
-        return response()->json($response->data, $response->status);
+        $result = $this->passwordResetService->sendResetLink(new SendPasswordResetLinkDto($request->validated()));
+
+        return $result->toResponse();
     }
 
     public function reset(ResetPasswordRequest $request)
     {
-        $response = $this->passwordResetService->reset(new ResetPasswordDto($request->only('email', 'password', 'password_confirmation', 'token')));
-        return response()->json($response->data, $response->status);
+        $result = $this->passwordResetService->reset(new ResetPasswordDto($request->only('email', 'password', 'password_confirmation', 'token')));
+
+        return $result->toResponse();
     }
 }

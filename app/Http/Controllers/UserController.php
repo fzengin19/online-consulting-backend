@@ -19,25 +19,30 @@ class UserController extends Controller
         $this->userService = $userServiceInterface;
     }
 
+    public function getProfile()
+    {
+        $result = $this->userService->getUserProfile();
+        return $result->toResponse();
+    }
+
     public function updateAvatar(UpdateAvatarRequest $request)
     {
-
-        $response = $this->userService->updateAvatar(new UpdateAvatarDto($request->file('avatar')));
-
-        return response()->json($response->data, $response->status);
+        $result = $this->userService->updateAvatar(new UpdateAvatarDto($request->file('avatar')));
+        
+        return $result->toResponse();
     }
 
     public function updateProfile(UpdateUserProfileRequest $request)
     {
-        $response = $this->userService->updateProfile(new UpdateUserProfileDto($request->validated()));
-
-        return response()->json($response->data, $response->status);
+        $result = $this->userService->updateProfile(new UpdateUserProfileDto($request->validated()));
+        
+        return $result->toResponse();
     }
 
     public function updateAddress(UpdateUserAddressRequest $request)
     {
-        $response = $this->userService->updateAddress(new UpdateUserAddressDto($request->validated()));
+        $result = $this->userService->updateAddress(new UpdateUserAddressDto($request->validated()));
 
-        return response()->json($response->data, $response->status);
+        return $result->toResponse();
     }
 }

@@ -30,6 +30,12 @@ class UserService implements UserServiceInterface
         $this->userAddressRepository = $userAddressRepository;
     }
 
+    public function getUserProfile(): ServiceResponse
+    {
+        $user = Auth::user();
+        $user->load('address');
+        return new ServiceResponse(['user' => $user], 200);
+    }
 
     public function updateAvatar(UpdateAvatarDto $updateAvatarDto): ServiceResponse
     {

@@ -33,6 +33,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->create($validatedData);
         $token = $user->createToken('api-token')->plainTextToken;
         $user->load('address');
+
         return new ServiceResponse([
             'message' => 'User registered successfully',
             'user' => $user,
