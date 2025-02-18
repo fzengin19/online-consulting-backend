@@ -33,7 +33,6 @@ class UserService implements UserServiceInterface
     public function getUserProfile(): ServiceResponse
     {
         $user = Auth::user();
-        $user->load('address');
         return new ServiceResponse(['user' => $user], 200);
     }
 
@@ -43,11 +42,11 @@ class UserService implements UserServiceInterface
 
         $currentAvatar = $user->avatar;
 
-        $name = $updateAvatarDto->avatar->getClientOriginalName();
+        $name = uniqid() . '.' .$updateAvatarDto->avatar->getClientOriginalExtension();
       
         $newPath = $updateAvatarDto->avatar->storeAs('avatars', $name);
 
-        $updated = $this->userRepository->update($user->id, ['avatar' => $newPath]);
+        $updated = $this->userRepository->update($user->id, ['avatar' => $name]);
 
         if ($currentAvatar) {
             Storage::delete($currentAvatar);
@@ -65,7 +64,6 @@ class UserService implements UserServiceInterface
 
         $updatedUser = $this->userRepository->update($user->id, $updateUserProfileDto->toArray());
         if ($updatedUser) {
-            $updatedUser->load('address');
             return new ServiceResponse(['message' => 'Profile data updated successfully.', 'user' => $updatedUser], 200);
         }
 
@@ -88,7 +86,7 @@ class UserService implements UserServiceInterface
 
                 return new ServiceResponse([
                     'message' => 'Address updated successfully.',
-                    'user' => $user->refresh()->load('address')
+                    'user' => $user->refresh()
                 ], 200);
             });
         } catch (\Exception $e) {

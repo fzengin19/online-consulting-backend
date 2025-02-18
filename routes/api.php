@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\SleepMiddleware;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 Route::prefix('auth')->group(function () {
@@ -36,14 +36,18 @@ Route::prefix('user')->middleware(['auth:sanctum'])->group(function () {
 
 // routes/api.php
 
-Route::get('/images/{fileName}', function (Request $request, $filePath) {
+Route::get('/profile-image/{fileName}', function (Request $request, $fileName) {
+    $filePath = 'avatars/' . $fileName;
 
-
-    if (Storage::disk('local')->exists($filePath)) {
-        $path = Storage::disk('local')->path($filePath);
-        return response()->file($path);
+    if (!Storage::exists($filePath)) {
+        return response()->json(['message' => 'File not found'], 404);
     }
 
-    return response()->json(['message' => 'File not found'], 404);
-});
+    // Cache süresi (örn: 10 dakika)
+    $cacheKey = 'signed_url_' . $fileName;
+    $temporaryUrl = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($filePath) {
+        return Storage::disk('s3')->temporaryUrl($filePath, now()->addMinutes(10));
+    });
 
+    return redirect($temporaryUrl,302);
+})->name('profile-image');

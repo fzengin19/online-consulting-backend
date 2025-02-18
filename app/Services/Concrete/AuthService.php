@@ -32,7 +32,6 @@ class AuthService implements AuthServiceInterface
         $validatedData['slug'] = Str::slug($validatedData['name']) . '-' . uniqid(5);
         $user = $this->userRepository->create($validatedData);
         $token = $user->createToken('api-token')->plainTextToken;
-        $user->load('address');
 
         return new ServiceResponse([
             'message' => 'User registered successfully',
@@ -49,7 +48,6 @@ class AuthService implements AuthServiceInterface
         }
 
         $token = $user->createToken('api-token')->plainTextToken;
-        $user->load('address');
         return new ServiceResponse([
             'message' => 'Logged in successfully',
             'token' => $token,
