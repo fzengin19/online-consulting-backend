@@ -42,9 +42,9 @@ class UserService implements UserServiceInterface
 
         $currentAvatar = $user->avatar;
 
-        $name = uniqid() . '.' .$updateAvatarDto->avatar->getClientOriginalExtension();
-      
-        $newPath = $updateAvatarDto->avatar->storeAs('avatars', $name);
+        $name = uniqid() . '.' . $updateAvatarDto->avatar->getClientOriginalExtension();
+
+        $updateAvatarDto->avatar->storeAs('avatars', $name);
 
         $updated = $this->userRepository->update($user->id, ['avatar' => $name]);
 
@@ -52,7 +52,13 @@ class UserService implements UserServiceInterface
             Storage::delete($currentAvatar);
         }
         if ($updated) {
-            return new ServiceResponse(['message' => 'Avatar updated successfully.'], 200);
+            return new ServiceResponse(
+                [
+                    'message' => 'Avatar updated successfully.',
+                    'avatar' => $name
+                ],
+                200
+            );
         }
 
         return new ServiceResponse(['message' => 'Failed to update avatar.'], 500);
